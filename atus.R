@@ -4,7 +4,8 @@ library(reshape2)
 library(survey)
 
 # Export 6 from ATUS
-# "Time spent working from home by broad occupation, class of worker, and hours worked w/ weekday and holiday flags (2003-2015) w/ CSV
+# "Time spent working from home by broad occupation, class of worker, and hours worked w/ weekday and holiday 
+# flags (2003-2015) w/ CSV
 
 # ATUS estimation formulas, see page 37:
 # https://www.bls.gov/tus/atususersguide.pdf
@@ -13,7 +14,8 @@ library(survey)
 ANNUAL_WORKDAYS = 251
 
 # Read ATUS export
-atus <- read_csv("atus_00006.csv", col_types="ciidiiid")
+atus_fn <- 'atus_00001.csv'  # Added by Steve
+atus <- read_csv(atus_fn, col_types="ciidiiid")
 
 # Convert years to a factor
 atus$year <- as.factor(atus$YEAR)
@@ -22,10 +24,10 @@ atus$year <- as.factor(atus$YEAR)
 atus$workday <- (atus$DAY >= 2 & atus$DAY <= 6 & atus$HOLIDAY == 0)
 
 # Flag for those that worked at home at all
-atus$homeworkers <- (atus$workingfromhome > 0)
+atus$homeworkers <- (atus$WORKINGFROMHOME > 0)
 
 # Flag for those that worked at least 7 hours at home (~ 35 hours a week)
-atus$homeworkers.fullday <- (atus$workingfromhome >= 420)
+atus$homeworkers.fullday <- (atus$WORKINGFROMHOME >= 420)
 
 # Flag for wage-workers (not self-employed)
 atus$wageworkers <- (atus$CLWKR <= 5)
@@ -34,7 +36,7 @@ atus$wageworkers <- (atus$CLWKR <= 5)
 atus$fulltime <- (atus$UHRSWORK1 >= 35)
 
 # Load ATUS OCC2 code mapping
-occ2 <- read_csv("atus-occ2.csv", col_types="ic")
+occ2 <- read_tsv("atus-occ2.tsv", col_types="ic")
 
 # Join descriptions
 atus <- atus %>%
@@ -57,7 +59,7 @@ atus.anytime.totals <- atus %>%
   group_by(year) %>%
   summarise(
     n = sum(WT06) / ANNUAL_WORKDAYS,
-    mean.mins = sum(workingfromhome * WT06) / sum(WT06)
+    mean.mins = sum(WORKINGFROMHOME * WT06) / sum(WT06)
   )
 
 write_csv(atus.anytime.totals, "results/atus.anytime.totals.csv")
@@ -78,7 +80,7 @@ atus.anytime.occ.totals <- atus %>%
   group_by(year, occupation) %>%
   summarise(
     n = sum(WT06) / ANNUAL_WORKDAYS,
-    mean.mins = sum(workingfromhome * WT06) / sum(WT06)
+    mean.mins = sum(WORKINGFROMHOME * WT06) / sum(WT06)
   )
 
 write_csv(atus.anytime.occ.totals, "results/atus.anytime.occ.totals.csv")
@@ -113,7 +115,7 @@ atus.pooled <- atus %>%
 atus.pooled <- cbind(pool.year = character(), atus.pooled)
 
 for (year in 2004:2014) {
-  for (y in (year - 1):(year + 1)) {
+  for (y in (year - 1):(year + 1)) {  # (Steve): Create a 3-year window
     temp <- atus %>%
       filter(year == y)
     
@@ -131,7 +133,7 @@ atus.pooled.anytime.totals <- atus.pooled %>%
   group_by(pool.year) %>%
   summarise(
     n = sum(WT06) / (ANNUAL_WORKDAYS * 3),
-    mean.mins = sum(workingfromhome * WT06) / sum(WT06)
+    mean.mins = sum(WORKINGFROMHOME * WT06) / sum(WT06)
   )
 
 write_csv(atus.pooled.anytime.totals, "results/atus.pooled.anytime.totals.csv")

@@ -7,7 +7,7 @@ library(survey)
 # "Method of travel to work, wages, occupation, industry, class of worker, and usual hours worked (1980, 1990, 2000-2015) w/ CSV"
 
 # Read IPUMS export
-ipums.orig <- read_csv("usa_00030.csv", col_types="ciiiiiidi")
+ipums.orig <- read_csv("usa_00001_sample.csv", col_types="ciiiiiidi")
 
 # Filter to only full-time wageworkers (>= 35 hours per week, with wages, and not self-employed)
 ipums <- ipums.orig %>%
