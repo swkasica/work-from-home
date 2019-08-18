@@ -4,6 +4,16 @@ Analysis of American Community Survey (ACS) and American Time Use Survey (ATUS) 
 
 Data used by these scripts was exported from [IPUMS](http://ipums.org). Due to the size of the data, it is impossible to include it in the repository, however the codebooks describing the exports are included for those that wish to recreate them.
 
+## Steve's Notes
+
+What's interesting about this analysis is the 3-year rolling window in `atus.R`. 
+
+TODO: I'm not exactly sure why this analysis is using a 3-year rolling window for the "pooled" data.
+
+![ipsums workflow](ipsums_workflow.jpg)
+
+![atus workflow](atus_workflow.jpg)
+
 ## What's in here
 
 * `atus.R`: Analysis of ATUS data.
